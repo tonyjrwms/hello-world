@@ -1,0 +1,38 @@
+@if (uiState.openSheet() === 'envelope-form') {
+  <div class="backdrop" (click)="uiState.closeSheet()">
+    <div class="sheet" (click)="$event.stopPropagation()">
+      <div class="sheet-head">
+        <h3>{{ isEditing() ? 'Edit envelope' : 'Add envelope' }}</h3>
+        <button class="icon-btn" type="button" (click)="uiState.closeSheet()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form class="sheet-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="field">
+          <label for="catName">Name</label>
+          <input id="catName" type="text" placeholder="Groceries" maxlength="24" formControlName="name" />
+        </div>
+        <div class="field">
+          <label for="catAmount">Amount per paycheck</label>
+          <input id="catAmount" class="num-input" type="number" min="0" step="0.01" inputmode="decimal" formControlName="allocated" />
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" formControlName="rollover" />
+          Roll leftover (or overspend) into next paycheck
+        </label>
+        <div class="sheet-actions">
+          <button type="submit" class="btn-block primary" [disabled]="form.invalid">
+            {{ isEditing() ? 'Save changes' : 'Add envelope' }}
+          </button>
+        </div>
+      </form>
+
+      @if (isEditing()) {
+        <button type="button" class="text-btn danger centered" (click)="remove()">Delete this envelope</button>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,18 @@
+<div class="app">
+  <app-header />
+
+  <app-pay-period-card />
+
+  <nav class="tabs" role="tablist">
+    <a class="tab" routerLink="/envelopes" routerLinkActive="active">Envelopes</a>
+    <a class="tab" routerLink="/history" routerLinkActive="active">History</a>
+  </nav>
+
+  <main>
+    <router-outlet />
+  </main>
+</div>
+
+<app-settings-sheet />
+<app-envelope-form-sheet />
+<app-toast />

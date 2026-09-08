@@ -1,0 +1,13 @@
+<div class="history-card">
+  <div class="history-top">
+    <span class="history-date">{{ entry().paidDate | date: 'EEE, MMM d' }}</span>
+    <span class="history-income num">{{ entry().income | currency }}</span>
+  </div>
+  <div class="history-bar-track">
+    <div class="history-bar-spent" [class.overspent]="overspent()" [style.width.%]="percentSpent()"></div>
+  </div>
+  <div class="history-foot">
+    <span>{{ entry().spent | currency }} spent of {{ entry().allocated | currency }} allocated</span>
+    <span>{{ left() | currency }} left</span>
+  </div>
+</div>

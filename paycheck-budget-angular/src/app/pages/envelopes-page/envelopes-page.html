@@ -1,0 +1,28 @@
+<div class="section-head">
+  <h2>This pay period</h2>
+  <span class="section-sub">
+    {{ budget.envelopes().length }} {{ budget.envelopes().length === 1 ? 'envelope' : 'envelopes' }}
+  </span>
+</div>
+
+<div class="envelope-list">
+  @if (budget.envelopes().length === 0) {
+    <div class="empty-state">No envelopes yet.<br />Add one to start assigning your paycheck.</div>
+  } @else {
+    @for (envelope of budget.envelopes(); track envelope.id) {
+      <div class="envelope" [class.open]="uiState.expandedEnvelopeId() === envelope.id">
+        <app-envelope-item
+          [envelope]="envelope"
+          [expanded]="uiState.expandedEnvelopeId() === envelope.id"
+          (toggle)="uiState.toggleExpanded(envelope.id)"
+          (addExpense)="onAddExpense(envelope.id, $event)"
+          (deleteTransaction)="budget.deleteTransaction(envelope.id, $event)"
+          (edit)="uiState.openEnvelopeForm(envelope)"
+          (remove)="onRemove(envelope)"
+        />
+      </div>
+    }
+  }
+</div>
+
+<button class="btn-add-category" type="button" (click)="uiState.openEnvelopeForm(null)">+ Add envelope</button>

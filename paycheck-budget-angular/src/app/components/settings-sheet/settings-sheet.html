@@ -1,0 +1,39 @@
+@if (uiState.openSheet() === 'settings') {
+  <div class="backdrop" (click)="uiState.closeSheet()">
+    <div class="sheet" (click)="$event.stopPropagation()">
+      <div class="sheet-head">
+        <h3>Paycheck settings</h3>
+        <button class="icon-btn" type="button" (click)="uiState.closeSheet()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form class="sheet-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="field">
+          <label for="setAmount">Take-home pay per check</label>
+          <input id="setAmount" class="num-input" type="number" min="0" step="0.01" inputmode="decimal" formControlName="amount" />
+        </div>
+        <div class="field">
+          <label for="setFreq">Pay frequency</label>
+          <select id="setFreq" formControlName="frequency">
+            <option value="weekly">Weekly</option>
+            <option value="biweekly">Every 2 weeks</option>
+            <option value="semimonthly">Twice a month (1st &amp; 15th)</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="setNextDate">Next payday</label>
+          <input id="setNextDate" type="date" formControlName="nextDate" />
+        </div>
+        <div class="sheet-actions">
+          <button type="submit" class="btn-block primary" [disabled]="form.invalid">Save</button>
+        </div>
+      </form>
+
+      <button type="button" class="text-btn danger centered" (click)="resetApp()">Reset all data and start over</button>
+    </div>
+  </div>
+}

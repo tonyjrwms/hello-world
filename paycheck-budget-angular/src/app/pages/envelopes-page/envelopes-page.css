@@ -1,0 +1,31 @@
+:host {
+  display: contents;
+}
+
+.envelope-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.envelope {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.btn-add-category {
+  border: 1.5px dashed var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  border-radius: 14px;
+  padding: 13px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-add-category:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}

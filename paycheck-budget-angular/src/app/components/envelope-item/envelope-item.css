@@ -1,0 +1,198 @@
+:host {
+  display: contents;
+}
+
+.envelope-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--ink);
+}
+
+.env-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.env-badge.state-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+.env-badge.state-critical {
+  background: var(--critical-soft);
+  color: var(--critical);
+}
+
+.env-main {
+  flex: 1;
+  min-width: 0;
+}
+.env-name-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+}
+.env-name {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+.env-remaining {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.env-remaining.critical {
+  color: var(--critical);
+}
+.env-sub-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 5px;
+}
+.env-sub {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+.env-bar-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  margin-top: 7px;
+  overflow: hidden;
+  display: block;
+}
+.env-bar-fill {
+  height: 100%;
+  display: block;
+  border-radius: 3px;
+  background: var(--accent);
+}
+.env-bar-fill.state-warning {
+  background: var(--warning);
+}
+.env-bar-fill.state-critical {
+  background: var(--critical);
+}
+
+.chev {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+.chev.flipped {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chev {
+    transition: transform 0.15s ease;
+  }
+}
+
+.env-detail {
+  border-top: 1px solid var(--line);
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface-2);
+}
+
+.quick-add {
+  display: flex;
+  gap: 8px;
+}
+.quick-add input[type='text'],
+.quick-add input[type='number'] {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 9px;
+  padding: 9px 10px;
+  font-size: 13.5px;
+}
+.quick-add input[name='amount'] {
+  width: 88px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.quick-add input[name='note'] {
+  flex: 1;
+  min-width: 0;
+}
+.btn-add {
+  background: var(--ink);
+  color: var(--surface);
+  border: none;
+  border-radius: 9px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tx-empty {
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  font-style: italic;
+  margin: 0;
+}
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.tx-note {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+.tx-amount {
+  font-weight: 600;
+}
+.tx-del {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.tx-del:hover {
+  color: var(--critical);
+  background: var(--critical-soft);
+}
+
+.env-manage {
+  display: flex;
+  gap: 14px;
+  padding-top: 2px;
+  border-top: 1px dashed var(--line);
+}

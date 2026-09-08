@@ -1,0 +1,13 @@
+<div class="section-head">
+  <h2>Past paychecks</h2>
+</div>
+
+@if (budget.history().length === 0) {
+  <div class="empty-state">No past paychecks yet.<br />They'll show up here after you tap &ldquo;I got paid.&rdquo;</div>
+} @else {
+  <div class="history-list">
+    @for (entry of recentFirst(); track entry.paidDate) {
+      <app-history-card [entry]="entry" />
+    }
+  </div>
+}

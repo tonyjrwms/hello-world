@@ -1,0 +1,30 @@
+:host {
+  display: contents;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.topbar h1 {
+  font-size: 19px;
+  flex: 1;
+}

@@ -1,0 +1,48 @@
+:host {
+  display: contents;
+}
+
+.history-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.history-date {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.history-income {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.history-bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.history-bar-spent {
+  height: 100%;
+  background: var(--accent);
+}
+.history-bar-spent.overspent {
+  background: var(--critical);
+}
+
+.history-foot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}

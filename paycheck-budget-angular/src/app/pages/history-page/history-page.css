@@ -1,0 +1,9 @@
+:host {
+  display: contents;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

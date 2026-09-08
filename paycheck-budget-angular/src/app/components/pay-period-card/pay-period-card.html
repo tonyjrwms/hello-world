@@ -1,0 +1,52 @@
+<section class="pp-card">
+  <div class="pp-top">
+    <div>
+      <p class="eyebrow">Next payday</p>
+      <p class="pp-date">
+        {{ budget.paycheck().nextDate | date: 'EEE, MMM d' }}
+        &middot;
+        <span class="countdown">{{ budget.paycheck().nextDate | daysUntil }}</span>
+      </p>
+    </div>
+    <button class="btn-primary" type="button" (click)="gotPaid()">I got paid</button>
+  </div>
+
+  <div class="pp-amount">
+    <span class="pp-amount-value num">{{ budget.paycheck().amount | currency }}</span>
+    <span class="pp-amount-freq">{{ frequencyLabel() }}</span>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat">
+      <span class="stat-label">Allocated</span>
+      <span class="stat-value num">{{ budget.totals().allocated | currency }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Spent</span>
+      <span class="stat-value num">{{ budget.totals().spent | currency }}</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Left to spend</span>
+      <span
+        class="stat-value num"
+        [class.critical]="budget.totals().left < 0"
+        [class.accent]="budget.totals().left >= 0"
+      >
+        {{ budget.totals().left | currency }}
+      </span>
+    </div>
+  </div>
+
+  @if (Math.abs(budget.totals().unallocated) < 0.005) {
+    <p class="unalloc-note">Every dollar is assigned to an envelope.</p>
+  } @else if (budget.totals().unallocated > 0) {
+    <p class="unalloc-note">
+      {{ budget.totals().unallocated | currency }} unallocated &mdash;
+      <button class="link-btn" type="button" (click)="uiState.openEnvelopeForm(null)">give it a job</button>
+    </p>
+  } @else {
+    <p class="unalloc-note warn">
+      Envelopes exceed this paycheck by {{ -budget.totals().unallocated | currency }}.
+    </p>
+  }
+</section>

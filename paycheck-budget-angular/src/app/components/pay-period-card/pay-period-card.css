@@ -1,0 +1,133 @@
+:host {
+  display: contents;
+}
+
+.pp-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 18px 16px;
+  box-shadow: var(--shadow);
+}
+
+.pp-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 3px;
+}
+
+.pp-date {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.countdown {
+  color: var(--accent-ink);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--surface);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.pp-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 14px;
+}
+.pp-amount-value {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1;
+}
+.pp-amount-freq {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-transform: capitalize;
+}
+
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 14px;
+}
+.stat {
+  background: var(--surface-2);
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+.stat-value {
+  font-size: 15px;
+  font-weight: 600;
+}
+.stat-value.critical {
+  color: var(--critical);
+}
+.stat-value.accent {
+  color: var(--accent-ink);
+}
+
+.unalloc-note {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.unalloc-note.warn {
+  color: var(--critical);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
