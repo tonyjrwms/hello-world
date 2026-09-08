@@ -1,0 +1,851 @@
+<title>Paycheck Ledger</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF0E8;
+    --surface:#FAFAF5;
+    --surface-2:#F1F2EA;
+    --ink:#1E2622;
+    --ink-soft:#5B655D;
+    --ink-faint:#656C60;
+    --line:#DBDECF;
+    --accent:#2F6F4E;
+    --accent-ink:#163B28;
+    --accent-soft:#DCEBE1;
+    --warning:#96631F;
+    --warning-soft:#F1E3C7;
+    --critical:#A63D2F;
+    --critical-soft:#F5DDD7;
+    --shadow:0 1px 2px rgba(30,38,34,.06), 0 6px 20px -8px rgba(30,38,34,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#11160F;
+      --surface:#1A2119;
+      --surface-2:#212A20;
+      --ink:#EAEDE4;
+      --ink-soft:#A4AC9E;
+      --ink-faint:#8A9284;
+      --line:#2B342A;
+      --accent:#63C08D;
+      --accent-ink:#BDEAD0;
+      --accent-soft:#1E362A;
+      --warning:#E3AC5C;
+      --warning-soft:#3B2F18;
+      --critical:#E58873;
+      --critical-soft:#3D211C;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -10px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#11160F;
+    --surface:#1A2119;
+    --surface-2:#212A20;
+    --ink:#EAEDE4;
+    --ink-soft:#A4AC9E;
+    --ink-faint:#8A9284;
+    --line:#2B342A;
+    --accent:#63C08D;
+    --accent-ink:#BDEAD0;
+    --accent-soft:#1E362A;
+    --warning:#E3AC5C;
+    --warning-soft:#3B2F18;
+    --critical:#E58873;
+    --critical-soft:#3D211C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -10px rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:"Fraunces",Georgia,"Times New Roman",serif;
+    font-weight:700;
+    letter-spacing:-.01em;
+    text-wrap:balance;
+    margin:0;
+  }
+  .num{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",monospace;font-variant-numeric:tabular-nums;}
+  button{font-family:inherit;}
+  svg{display:block;}
+
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    padding:16px 16px calc(28px + env(safe-area-inset-bottom));
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  /* ---- Header ---- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding-top:4px;
+  }
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;
+    background:var(--accent);color:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Fraunces",serif;font-weight:700;font-size:15px;
+    flex-shrink:0;
+  }
+  .topbar h1{font-size:19px;flex:1;}
+  .icon-btn{
+    width:36px;height:36px;border-radius:10px;
+    border:1px solid var(--line);background:var(--surface);
+    color:var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .icon-btn:hover{color:var(--ink);border-color:var(--ink-faint);}
+  .icon-btn:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+
+  /* ---- Pay period card ---- */
+  .pp-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:18px 18px 16px;
+    box-shadow:var(--shadow);
+  }
+  .pp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .eyebrow{
+    font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 3px;
+  }
+  .pp-date{margin:0;font-size:15px;font-weight:600;}
+  .pp-date .countdown{color:var(--accent-ink);}
+  .btn-primary{
+    background:var(--accent);color:var(--surface);
+    border:none;border-radius:10px;padding:10px 14px;
+    font-size:13.5px;font-weight:600;white-space:nowrap;cursor:pointer;
+  }
+  .btn-primary:hover{filter:brightness(1.06);}
+  .btn-primary:active{transform:translateY(1px);}
+
+  .pp-amount{display:flex;align-items:baseline;gap:8px;margin-top:14px;}
+  .pp-amount-value{font-family:"Fraunces",serif;font-weight:700;font-size:34px;line-height:1;}
+  .pp-amount-freq{font-size:13px;color:var(--ink-soft);text-transform:capitalize;}
+
+  .stat-strip{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;
+    margin-top:14px;
+  }
+  .stat{background:var(--surface-2);padding:9px 10px;display:flex;flex-direction:column;gap:2px;}
+  .stat-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:600;}
+  .stat-value{font-size:15px;font-weight:600;}
+  .stat-value.critical{color:var(--critical);}
+  .stat-value.accent{color:var(--accent-ink);}
+
+  .unalloc-note{
+    margin:12px 0 0;font-size:12.5px;color:var(--ink-soft);
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  }
+  .unalloc-note.warn{color:var(--critical);}
+  .link-btn{
+    background:none;border:none;padding:0;color:var(--accent-ink);
+    font-weight:600;font-size:12.5px;cursor:pointer;text-decoration:underline;
+    text-underline-offset:2px;
+  }
+
+  /* ---- Tabs ---- */
+  .tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:3px;}
+  .tab{
+    flex:1;border:none;background:transparent;color:var(--ink-soft);
+    padding:8px 0;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .tab.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+  /* ---- Envelope list ---- */
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}
+  .section-head h2{font-size:15px;}
+  .section-sub{font-size:12px;color:var(--ink-faint);}
+
+  .envelope-list{display:flex;flex-direction:column;gap:10px;}
+  .envelope{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;
+  }
+  .envelope-head{
+    width:100%;display:flex;align-items:center;gap:11px;
+    padding:12px 14px;background:none;border:none;cursor:pointer;text-align:left;
+    color:var(--ink);
+  }
+  .env-badge{
+    width:30px;height:30px;border-radius:8px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Fraunces",serif;font-weight:700;font-size:13px;
+    background:var(--accent-soft);color:var(--accent-ink);
+  }
+  .env-badge.state-warning{background:var(--warning-soft);color:var(--warning);}
+  .env-badge.state-critical{background:var(--critical-soft);color:var(--critical);}
+  .env-main{flex:1;min-width:0;}
+  .env-name-row{display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
+  .env-name{font-weight:600;font-size:14.5px;}
+  .env-remaining{font-size:13.5px;font-weight:600;}
+  .env-remaining.critical{color:var(--critical);}
+  .env-sub-row{display:flex;justify-content:space-between;gap:8px;margin-top:5px;}
+  .env-sub{font-size:11.5px;color:var(--ink-faint);}
+  .env-bar-track{height:5px;border-radius:3px;background:var(--surface-2);margin-top:7px;overflow:hidden;}
+  .env-bar-fill{height:100%;border-radius:3px;background:var(--accent);}
+  .env-bar-fill.state-warning{background:var(--warning);}
+  .env-bar-fill.state-critical{background:var(--critical);}
+  .chev{color:var(--ink-faint);transition:transform .15s ease;flex-shrink:0;}
+  .envelope.open .chev{transform:rotate(180deg);}
+
+  .env-detail{
+    border-top:1px solid var(--line);padding:12px 14px 14px;
+    display:flex;flex-direction:column;gap:12px;
+    background:var(--surface-2);
+  }
+  .quick-add{display:flex;gap:8px;}
+  .quick-add input[type="text"],.quick-add input[type="number"]{
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);
+    border-radius:9px;padding:9px 10px;font-size:13.5px;
+  }
+  .quick-add input[name="amount"]{width:88px;font-family:"IBM Plex Mono",monospace;}
+  .quick-add input[name="note"]{flex:1;min-width:0;}
+  .btn-add{
+    background:var(--ink);color:var(--surface);border:none;border-radius:9px;
+    padding:0 14px;font-size:13px;font-weight:600;cursor:pointer;
+  }
+  .tx-list{display:flex;flex-direction:column;gap:6px;}
+  .tx-empty{font-size:12.5px;color:var(--ink-faint);font-style:italic;}
+  .tx-row{display:flex;align-items:center;gap:8px;font-size:13px;}
+  .tx-note{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-soft);}
+  .tx-amount{font-weight:600;}
+  .tx-del{
+    background:none;border:none;color:var(--ink-faint);cursor:pointer;
+    width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0;
+  }
+  .tx-del:hover{color:var(--critical);background:var(--critical-soft);}
+
+  .env-manage{display:flex;gap:14px;padding-top:2px;border-top:1px dashed var(--line);}
+  .text-btn{
+    background:none;border:none;padding:6px 0;color:var(--ink-soft);
+    font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;
+  }
+  .text-btn:hover{color:var(--ink);}
+  .text-btn.danger:hover{color:var(--critical);}
+
+  .btn-add-category{
+    border:1.5px dashed var(--line);background:transparent;color:var(--ink-soft);
+    border-radius:14px;padding:13px;font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .btn-add-category:hover{border-color:var(--accent);color:var(--accent-ink);}
+
+  /* ---- History ---- */
+  .history-list{display:flex;flex-direction:column;gap:10px;}
+  .history-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:13px 14px;display:flex;flex-direction:column;gap:8px;
+  }
+  .history-top{display:flex;justify-content:space-between;align-items:baseline;}
+  .history-date{font-weight:600;font-size:13.5px;}
+  .history-income{font-size:13px;color:var(--ink-soft);}
+  .history-bar-track{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;display:flex;}
+  .history-bar-spent{height:100%;background:var(--accent);}
+  .history-foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--ink-faint);}
+  .empty-state{
+    text-align:center;padding:40px 20px;color:var(--ink-faint);font-size:13.5px;
+    display:flex;flex-direction:column;gap:6px;align-items:center;
+  }
+
+  /* ---- Sheets ---- */
+  .backdrop{
+    position:fixed;inset:0;background:rgba(15,20,15,.42);
+    display:flex;align-items:flex-end;justify-content:center;z-index:20;
+  }
+  .sheet{
+    background:var(--surface);width:100%;max-width:480px;
+    border-radius:20px 20px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;gap:14px;
+    box-shadow:0 -8px 30px rgba(0,0,0,.25);
+    max-height:88vh;overflow-y:auto;
+  }
+  .sheet-head{display:flex;justify-content:space-between;align-items:center;}
+  .sheet-head h3{font-size:17px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:12px;font-weight:600;color:var(--ink-soft);}
+  .field input,.field select{
+    border:1px solid var(--line);background:var(--surface-2);color:var(--ink);
+    border-radius:10px;padding:10px 11px;font-size:14.5px;width:100%;
+  }
+  .field input.num-input{font-family:"IBM Plex Mono",monospace;}
+  .checkbox-row{display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--ink);}
+  .checkbox-row input{width:17px;height:17px;accent-color:var(--accent);}
+  .sheet-actions{display:flex;gap:10px;margin-top:4px;}
+  .btn-block{
+    flex:1;border-radius:11px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;
+  }
+  .btn-block.primary{background:var(--accent);color:var(--surface);}
+  .btn-block.ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line);}
+  .btn-block.danger-ghost{background:var(--critical-soft);color:var(--critical);}
+
+  /* ---- Toast ---- */
+  .toast{
+    position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));
+    transform:translateX(-50%);
+    background:var(--ink);color:var(--paper);
+    padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:30;max-width:90%;text-align:center;
+  }
+  [hidden]{display:none!important;}
+
+  @media (prefers-reduced-motion:no-preference){
+    .envelope-head, .env-detail, .chev, .btn-primary{transition:background-color .15s ease,transform .1s ease;}
+  }
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand-mark">PL</div>
+    <h1>Paycheck Ledger</h1>
+    <button class="icon-btn" id="settingsBtn" aria-label="Paycheck settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+    </button>
+  </header>
+
+  <section class="pp-card">
+    <div class="pp-top">
+      <div>
+        <p class="eyebrow">Next payday</p>
+        <p class="pp-date" id="ppDate">—</p>
+      </div>
+      <button class="btn-primary" id="gotPaidBtn">I got paid</button>
+    </div>
+    <div class="pp-amount">
+      <span class="pp-amount-value num" id="ppAmount">$0.00</span>
+      <span class="pp-amount-freq" id="ppFreq">—</span>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><span class="stat-label">Allocated</span><span class="stat-value num" id="statAllocated">$0.00</span></div>
+      <div class="stat"><span class="stat-label">Spent</span><span class="stat-value num" id="statSpent">$0.00</span></div>
+      <div class="stat"><span class="stat-label">Left to spend</span><span class="stat-value num accent" id="statLeft">$0.00</span></div>
+    </div>
+    <p class="unalloc-note" id="unallocNote"></p>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="budget" role="tab" aria-selected="true">Envelopes</button>
+    <button class="tab" data-tab="history" role="tab" aria-selected="false">History</button>
+  </div>
+
+  <section id="view-budget" class="view">
+    <div class="section-head">
+      <h2>This pay period</h2>
+      <span class="section-sub" id="envelopeCount">0 envelopes</span>
+    </div>
+    <div class="envelope-list" id="envelopeList"></div>
+    <button class="btn-add-category" id="addCategoryBtn">+ Add envelope</button>
+  </section>
+
+  <section id="view-history" class="view" hidden>
+    <div class="section-head">
+      <h2>Past paychecks</h2>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </section>
+</div>
+
+<div class="backdrop" id="backdrop" hidden></div>
+
+<div class="sheet" id="settingsSheet" hidden>
+  <div class="sheet-head"><h3>Paycheck settings</h3>
+    <button class="icon-btn" data-close-sheet aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+  <form id="settingsForm" style="display:flex;flex-direction:column;gap:12px;">
+    <div class="field">
+      <label for="setAmount">Take-home pay per check</label>
+      <input class="num-input" id="setAmount" name="amount" type="number" min="0" step="0.01" inputmode="decimal" required>
+    </div>
+    <div class="field">
+      <label for="setFreq">Pay frequency</label>
+      <select id="setFreq" name="frequency">
+        <option value="weekly">Weekly</option>
+        <option value="biweekly">Every 2 weeks</option>
+        <option value="semimonthly">Twice a month (1st &amp; 15th)</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="setNextDate">Next payday</label>
+      <input id="setNextDate" name="nextDate" type="date" required>
+    </div>
+    <div class="sheet-actions">
+      <button type="submit" class="btn-block primary">Save</button>
+    </div>
+    <button type="button" class="text-btn danger" id="resetAppBtn" style="align-self:center;">Reset all data and start over</button>
+  </form>
+</div>
+
+<div class="sheet" id="categorySheet" hidden>
+  <div class="sheet-head"><h3 id="categorySheetTitle">Add envelope</h3>
+    <button class="icon-btn" data-close-sheet aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+  <form id="categoryForm" style="display:flex;flex-direction:column;gap:12px;">
+    <input type="hidden" name="id">
+    <div class="field">
+      <label for="catName">Name</label>
+      <input id="catName" name="name" type="text" placeholder="Groceries" required maxlength="24">
+    </div>
+    <div class="field">
+      <label for="catAmount">Amount per paycheck</label>
+      <input class="num-input" id="catAmount" name="allocated" type="number" min="0" step="0.01" inputmode="decimal" required>
+    </div>
+    <label class="checkbox-row">
+      <input type="checkbox" name="rollover">
+      Roll leftover (or overspend) into next paycheck
+    </label>
+    <div class="sheet-actions">
+      <button type="submit" class="btn-block primary" id="categorySaveBtn">Add envelope</button>
+    </div>
+    <button type="button" class="text-btn danger" id="deleteCategoryBtn" style="align-self:center;" hidden>Delete this envelope</button>
+  </form>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+  "use strict";
+  var STORAGE_KEY = "paycheckLedger.v1";
+  var money = new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"});
+  var fmt = function(n){ return money.format(Math.round((n+Number.EPSILON)*100)/100); };
+  var uid = function(){ return Math.random().toString(36).slice(2,10); };
+
+  function sampleState(){
+    return {
+      paycheck:{ amount:1850, frequency:"biweekly", nextDate:"2026-09-19" },
+      categories:[
+        mkCat("Rent & Utilities",900,false,[
+          mkTx("Rent — Sept",850), mkTx("Electric bill",50)
+        ]),
+        mkCat("Groceries",280,false,[
+          mkTx("Trader Joe's",54.12), mkTx("Costco run",78.20), mkTx("Corner store",32.00)
+        ]),
+        mkCat("Gas & Transit",120,false,[
+          mkTx("Shell fill-up",48.10), mkTx("Metro card",48.00)
+        ]),
+        mkCat("Savings",250,false,[
+          mkTx("Auto-transfer to savings",250)
+        ]),
+        mkCat("Fun Money",80,true,[
+          mkTx("Movie night",32.50), mkTx("Concert tickets",56.00)
+        ]),
+        mkCat("Subscriptions",100,false,[
+          mkTx("Streaming bundle",24.99)
+        ])
+      ],
+      history:[
+        { paidDate:"2026-08-22", income:1850, allocated:1730, spent:1698.40 }
+      ]
+    };
+  }
+  function mkCat(name,allocated,rollover,txs){
+    var spent = txs.reduce(function(s,t){return s+t.amount;},0);
+    return { id:uid(), name:name, target:allocated, allocated:allocated, spent:spent, rollover:rollover, transactions:txs };
+  }
+  function mkTx(note,amount){ return { id:uid(), note:note, amount:amount }; }
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return sampleState();
+  }
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+
+  var state = load();
+  var activeTab = "budget";
+  var openEnvelopeId = null;
+
+  // ---------- date helpers ----------
+  function parseDate(s){ var p=s.split("-").map(Number); return new Date(p[0],p[1]-1,p[2]); }
+  function toISO(d){
+    var y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
+    return y+"-"+m+"-"+day;
+  }
+  function daysUntil(iso){
+    var today = new Date(); today.setHours(0,0,0,0);
+    var target = parseDate(iso); target.setHours(0,0,0,0);
+    return Math.round((target-today)/86400000);
+  }
+  function formatDate(iso){
+    var d = parseDate(iso);
+    return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+  }
+  function advanceDate(iso, frequency){
+    var d = parseDate(iso);
+    if(frequency==="weekly") d.setDate(d.getDate()+7);
+    else if(frequency==="biweekly") d.setDate(d.getDate()+14);
+    else if(frequency==="monthly") d.setMonth(d.getMonth()+1);
+    else if(frequency==="semimonthly"){
+      if(d.getDate()<15) d.setDate(15);
+      else { d.setMonth(d.getMonth()+1); d.setDate(1); }
+    }
+    return toISO(d);
+  }
+
+  // ---------- derived ----------
+  function totals(){
+    var allocated=0, spent=0;
+    state.categories.forEach(function(c){ allocated+=c.allocated; spent+=c.spent; });
+    return { allocated:allocated, spent:spent, left:allocated-spent, unallocated: state.paycheck.amount - allocated };
+  }
+  function envState(c){
+    if(c.allocated<=0) return c.spent>0 ? "critical" : "ok";
+    var pct = c.spent/c.allocated;
+    if(pct>1) return "critical";
+    if(pct>=0.8) return "warning";
+    return "ok";
+  }
+
+  // ---------- render ----------
+  var el = {
+    ppDate: document.getElementById("ppDate"),
+    ppAmount: document.getElementById("ppAmount"),
+    ppFreq: document.getElementById("ppFreq"),
+    statAllocated: document.getElementById("statAllocated"),
+    statSpent: document.getElementById("statSpent"),
+    statLeft: document.getElementById("statLeft"),
+    unallocNote: document.getElementById("unallocNote"),
+    envelopeList: document.getElementById("envelopeList"),
+    envelopeCount: document.getElementById("envelopeCount"),
+    historyList: document.getElementById("historyList"),
+    viewBudget: document.getElementById("view-budget"),
+    viewHistory: document.getElementById("view-history"),
+    toast: document.getElementById("toast")
+  };
+
+  var freqLabel = { weekly:"weekly", biweekly:"biweekly", semimonthly:"twice a month", monthly:"monthly" };
+
+  function renderSummary(){
+    var days = daysUntil(state.paycheck.nextDate);
+    var when = days<0 ? "overdue" : days===0 ? "today" : days===1 ? "in 1 day" : "in "+days+" days";
+    el.ppDate.innerHTML = formatDate(state.paycheck.nextDate) + " &middot; <span class=\"countdown\">"+when+"</span>";
+    el.ppAmount.textContent = fmt(state.paycheck.amount);
+    el.ppFreq.textContent = freqLabel[state.paycheck.frequency] || "";
+
+    var t = totals();
+    el.statAllocated.textContent = fmt(t.allocated);
+    el.statSpent.textContent = fmt(t.spent);
+    el.statLeft.textContent = fmt(t.left);
+    el.statLeft.classList.toggle("critical", t.left<0);
+    el.statLeft.classList.toggle("accent", t.left>=0);
+
+    if(Math.abs(t.unallocated) < 0.005){
+      el.unallocNote.classList.remove("warn");
+      el.unallocNote.innerHTML = "Every dollar is assigned to an envelope.";
+    } else if(t.unallocated>0){
+      el.unallocNote.classList.remove("warn");
+      el.unallocNote.innerHTML = fmt(t.unallocated)+" unallocated &mdash; <button class=\"link-btn\" id=\"assignBtn\">give it a job</button>";
+    } else {
+      el.unallocNote.classList.add("warn");
+      el.unallocNote.textContent = "Envelopes exceed this paycheck by "+fmt(Math.abs(t.unallocated))+".";
+    }
+    var assignBtn = document.getElementById("assignBtn");
+    if(assignBtn) assignBtn.addEventListener("click", function(){ openCategorySheet(null); });
+  }
+
+  function renderEnvelopes(){
+    el.envelopeCount.textContent = state.categories.length + (state.categories.length===1?" envelope":" envelopes");
+    el.envelopeList.innerHTML = "";
+    if(state.categories.length===0){
+      el.envelopeList.innerHTML = '<div class="empty-state">No envelopes yet.<br>Add one to start assigning your paycheck.</div>';
+      return;
+    }
+    state.categories.forEach(function(c){
+      var st = envState(c);
+      var pct = c.allocated>0 ? Math.min(100, (c.spent/c.allocated)*100) : (c.spent>0?100:0);
+      var remaining = c.allocated - c.spent;
+      var isOpen = openEnvelopeId === c.id;
+
+      var wrap = document.createElement("div");
+      wrap.className = "envelope"+(isOpen?" open":"");
+      wrap.dataset.id = c.id;
+
+      var initial = c.name.trim().charAt(0).toUpperCase() || "?";
+      var badgeClass = st==="ok" ? "" : " state-"+st;
+
+      var head = document.createElement("button");
+      head.className = "envelope-head";
+      head.type = "button";
+      head.setAttribute("aria-expanded", isOpen ? "true":"false");
+      head.innerHTML =
+        '<span class="env-badge'+badgeClass+'">'+initial+'</span>'+
+        '<span class="env-main">'+
+          '<span class="env-name-row"><span class="env-name">'+escapeHtml(c.name)+'</span>'+
+            '<span class="env-remaining'+(remaining<0?" critical":"")+' num">'+(remaining<0?"&minus;":"")+fmt(Math.abs(remaining))+'</span></span>'+
+          '<span class="env-sub-row"><span class="env-sub num">'+fmt(c.spent)+' of '+fmt(c.allocated)+'</span>'+
+            '<span class="env-sub">'+(c.rollover?"rolls over":"resets each check")+'</span></span>'+
+          '<span class="env-bar-track"><span class="env-bar-fill'+(st!=="ok"?" state-"+st:"")+'" style="width:'+pct+'%"></span></span>'+
+        '</span>'+
+        '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+      wrap.appendChild(head);
+
+      if(isOpen){
+        var detail = document.createElement("div");
+        detail.className = "env-detail";
+
+        var txHtml = "";
+        if(c.transactions.length===0){
+          txHtml = '<p class="tx-empty">No spending logged this period.</p>';
+        } else {
+          txHtml = '<div class="tx-list">' + c.transactions.slice().reverse().map(function(t){
+            return '<div class="tx-row"><span class="tx-note">'+escapeHtml(t.note||"Expense")+'</span>'+
+              '<span class="tx-amount num">'+fmt(t.amount)+'</span>'+
+              '<button class="tx-del" data-del-tx="'+t.id+'" aria-label="Delete expense">'+
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>';
+          }).join("") + '</div>';
+        }
+
+        detail.innerHTML =
+          '<form class="quick-add" data-add-tx>'+
+            '<input type="number" name="amount" min="0" step="0.01" inputmode="decimal" placeholder="0.00" required>'+
+            '<input type="text" name="note" placeholder="What was it for?" maxlength="40">'+
+            '<button type="submit" class="btn-add">Add</button>'+
+          '</form>'+
+          txHtml+
+          '<div class="env-manage">'+
+            '<button type="button" class="text-btn" data-edit-cat>'+
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Edit'+
+            '</button>'+
+            '<button type="button" class="text-btn danger" data-delete-cat>'+
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg> Delete'+
+            '</button>'+
+          '</div>';
+        wrap.appendChild(detail);
+      }
+
+      el.envelopeList.appendChild(wrap);
+    });
+  }
+
+  function renderHistory(){
+    if(state.history.length===0){
+      el.historyList.innerHTML = '<div class="empty-state">No past paychecks yet.<br>They\'ll show up here after you tap &ldquo;I got paid.&rdquo;</div>';
+      return;
+    }
+    el.historyList.innerHTML = state.history.slice().reverse().map(function(h){
+      var pct = h.allocated>0 ? Math.min(100,(h.spent/h.allocated)*100) : 0;
+      var over = h.spent>h.allocated;
+      return '<div class="history-card">'+
+        '<div class="history-top"><span class="history-date">'+formatDate(h.paidDate)+'</span>'+
+        '<span class="history-income num">'+fmt(h.income)+'</span></div>'+
+        '<div class="history-bar-track"><div class="history-bar-spent" style="width:'+pct+'%;background:'+(over?"var(--critical)":"var(--accent)")+'"></div></div>'+
+        '<div class="history-foot"><span>'+fmt(h.spent)+' spent of '+fmt(h.allocated)+' allocated</span>'+
+        '<span>'+fmt(h.allocated-h.spent)+' left</span></div>'+
+        '</div>';
+    }).join("");
+  }
+
+  function renderAll(){
+    renderSummary();
+    renderEnvelopes();
+    renderHistory();
+    save();
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  // ---------- toast ----------
+  var toastTimer = null;
+  function showToast(msg){
+    el.toast.textContent = msg;
+    el.toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.toast.hidden = true; }, 3200);
+  }
+
+  // ---------- tabs ----------
+  document.querySelectorAll(".tab").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      activeTab = btn.dataset.tab;
+      document.querySelectorAll(".tab").forEach(function(b){
+        b.classList.toggle("active", b===btn);
+        b.setAttribute("aria-selected", b===btn ? "true":"false");
+      });
+      el.viewBudget.hidden = activeTab!=="budget";
+      el.viewHistory.hidden = activeTab!=="history";
+    });
+  });
+
+  // ---------- envelope list interactions ----------
+  el.envelopeList.addEventListener("click", function(e){
+    var head = e.target.closest(".envelope-head");
+    if(head){
+      var id = head.closest(".envelope").dataset.id;
+      openEnvelopeId = (openEnvelopeId===id) ? null : id;
+      renderEnvelopes();
+      return;
+    }
+    var delTx = e.target.closest("[data-del-tx]");
+    if(delTx){
+      var envId = delTx.closest(".envelope").dataset.id;
+      var txId = delTx.dataset.delTx;
+      var cat = state.categories.find(function(c){return c.id===envId;});
+      if(cat){
+        var tx = cat.transactions.find(function(t){return t.id===txId;});
+        if(tx){ cat.spent -= tx.amount; cat.transactions = cat.transactions.filter(function(t){return t.id!==txId;}); }
+        renderAll();
+      }
+      return;
+    }
+    var editBtn = e.target.closest("[data-edit-cat]");
+    if(editBtn){
+      var eid = editBtn.closest(".envelope").dataset.id;
+      openCategorySheet(state.categories.find(function(c){return c.id===eid;}));
+      return;
+    }
+    var delBtn = e.target.closest("[data-delete-cat]");
+    if(delBtn){
+      var did = delBtn.closest(".envelope").dataset.id;
+      var cat2 = state.categories.find(function(c){return c.id===did;});
+      if(cat2 && confirm('Delete "'+cat2.name+'"? This removes its spending history too.')){
+        state.categories = state.categories.filter(function(c){return c.id!==did;});
+        openEnvelopeId = null;
+        renderAll();
+      }
+      return;
+    }
+  });
+
+  el.envelopeList.addEventListener("submit", function(e){
+    var form = e.target.closest("[data-add-tx]");
+    if(!form) return;
+    e.preventDefault();
+    var envId = form.closest(".envelope").dataset.id;
+    var cat = state.categories.find(function(c){return c.id===envId;});
+    var amount = parseFloat(form.amount.value);
+    if(!cat || !isFinite(amount) || amount<=0) return;
+    var note = form.note.value.trim();
+    cat.transactions.push(mkTx(note || "Expense", amount));
+    cat.spent += amount;
+    form.reset();
+    renderAll();
+  });
+
+  // ---------- got paid ----------
+  document.getElementById("gotPaidBtn").addEventListener("click", function(){
+    var t = totals();
+    state.history.push({ paidDate: state.paycheck.nextDate, income: state.paycheck.amount, allocated: t.allocated, spent: t.spent });
+    state.categories.forEach(function(c){
+      var leftover = c.allocated - c.spent;
+      c.allocated = c.rollover ? Math.max(0, c.target + leftover) : c.target;
+      c.spent = 0;
+      c.transactions = [];
+    });
+    state.paycheck.nextDate = advanceDate(state.paycheck.nextDate, state.paycheck.frequency);
+    openEnvelopeId = null;
+    renderAll();
+    showToast("Paycheck logged — envelopes are refilled for the new period.");
+  });
+
+  // ---------- sheets ----------
+  var backdrop = document.getElementById("backdrop");
+  var settingsSheet = document.getElementById("settingsSheet");
+  var categorySheet = document.getElementById("categorySheet");
+
+  function openSheet(sheet){
+    backdrop.hidden = false;
+    sheet.hidden = false;
+  }
+  function closeSheets(){
+    backdrop.hidden = true;
+    settingsSheet.hidden = true;
+    categorySheet.hidden = true;
+  }
+  backdrop.addEventListener("click", closeSheets);
+  document.querySelectorAll("[data-close-sheet]").forEach(function(b){ b.addEventListener("click", closeSheets); });
+
+  document.getElementById("settingsBtn").addEventListener("click", function(){
+    document.getElementById("setAmount").value = state.paycheck.amount;
+    document.getElementById("setFreq").value = state.paycheck.frequency;
+    document.getElementById("setNextDate").value = state.paycheck.nextDate;
+    openSheet(settingsSheet);
+  });
+  document.getElementById("settingsForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var f = e.target;
+    state.paycheck.amount = parseFloat(f.amount.value) || 0;
+    state.paycheck.frequency = f.frequency.value;
+    state.paycheck.nextDate = f.nextDate.value;
+    closeSheets();
+    renderAll();
+    showToast("Paycheck settings saved.");
+  });
+  document.getElementById("resetAppBtn").addEventListener("click", function(){
+    if(confirm("This clears every envelope, transaction and history entry and reloads the sample budget. Continue?")){
+      state = sampleState();
+      closeSheets();
+      renderAll();
+      showToast("Starting fresh.");
+    }
+  });
+
+  var categoryForm = document.getElementById("categoryForm");
+  var deleteCategoryBtn = document.getElementById("deleteCategoryBtn");
+  function openCategorySheet(cat){
+    document.getElementById("categorySheetTitle").textContent = cat ? "Edit envelope" : "Add envelope";
+    document.getElementById("categorySaveBtn").textContent = cat ? "Save changes" : "Add envelope";
+    categoryForm.id.value = cat ? cat.id : "";
+    categoryForm.name.value = cat ? cat.name : "";
+    categoryForm.allocated.value = cat ? cat.allocated : "";
+    categoryForm.rollover.checked = cat ? !!cat.rollover : false;
+    deleteCategoryBtn.hidden = !cat;
+    openSheet(categorySheet);
+  }
+  document.getElementById("addCategoryBtn").addEventListener("click", function(){ openCategorySheet(null); });
+  categoryForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var f = e.target;
+    var amount = parseFloat(f.allocated.value) || 0;
+    var name = f.name.value.trim();
+    if(!name) return;
+    if(f.id.value){
+      var cat = state.categories.find(function(c){return c.id===f.id.value;});
+      if(cat){ cat.name=name; cat.allocated=amount; cat.target=amount; cat.rollover=f.rollover.checked; }
+    } else {
+      state.categories.push(mkCat(name, amount, f.rollover.checked, []));
+    }
+    closeSheets();
+    renderAll();
+  });
+  deleteCategoryBtn.addEventListener("click", function(){
+    var id = categoryForm.id.value;
+    var cat = state.categories.find(function(c){return c.id===id;});
+    if(cat && confirm('Delete "'+cat.name+'"?')){
+      state.categories = state.categories.filter(function(c){return c.id!==id;});
+      openEnvelopeId = null;
+      closeSheets();
+      renderAll();
+    }
+  });
+
+  renderAll();
+})();
+</script>
