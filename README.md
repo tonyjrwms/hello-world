@@ -2,7 +2,7 @@
 This is a tutorial repository for hello-world
 This is the readme-edits branch feature
 
-## Paycheck Ledger
+## Paycheck Budget Planner
 
 A paycheck budgeting app that splits each paycheck into spending
 envelopes and tracks what's left in each until the next payday, in two

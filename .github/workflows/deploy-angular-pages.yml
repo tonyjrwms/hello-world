@@ -1,4 +1,4 @@
-name: Deploy Paycheck Ledger (Angular) to GitHub Pages
+name: Deploy Paycheck Budget Planner (Angular) to GitHub Pages
 
 on:
   push:

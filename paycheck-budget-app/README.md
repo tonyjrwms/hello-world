@@ -1,4 +1,4 @@
-# Paycheck Ledger
+# Paycheck Budget Planner
 
 A single-file, mobile-first budgeting app that splits each paycheck into
 "envelopes" (categories like Rent, Groceries, Fun Money) and tracks what's

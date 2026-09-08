@@ -1,4 +1,4 @@
-# Paycheck Ledger — Angular edition
+# Paycheck Budget Planner — Angular edition
 
 The same envelope-budgeting app as [`../paycheck-budget-app`](../paycheck-budget-app),
 rebuilt from scratch as a proper [Angular](https://angular.dev) project

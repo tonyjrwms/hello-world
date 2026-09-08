@@ -17,10 +17,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('renders the paycheck ledger header', async () => {
+  it('renders the app header', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Paycheck Ledger');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Paycheck Budget Planner');
   });
 });
